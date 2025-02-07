@@ -6,7 +6,7 @@ SELECT * FROM dimproduct;
 
 SELECT * FROM dimproductsubcategory;
 
--- 1.1 Esponi lʼanagrafica dei prodotti indicando per ciascun prodotto anche la sua sottocategoria DimProduct, DimProductSubcategory).
+-- 1.1 Esponi lʼanagrafica dei prodotti indicando per ciascun prodotto anche la sua sottocategoria (DimProduct, DimProductSubcategory).
 SELECT 
 	p.ProductKey, 
     p.ProductAlternateKey, 
@@ -16,8 +16,9 @@ SELECT
     s.ProductSubcategoryKey, 
     s.EnglishProductSubcategoryName
 FROM dimproduct as p
-RIGHT JOIN dimproductsubcategory as s
+LEFT JOIN dimproductsubcategory as s
 ON p.ProductSubcategoryKey = s.ProductSubcategoryKey;
+
 
 -- 1.2 Esponi lʼanagrafica dei prodotti indicando per ciascun prodotto la sua sottocategoria e la sua categoria (DimProduct, DimProductSubcategory, DimProductCategory).
 SELECT 
@@ -31,10 +32,10 @@ SELECT
     c.ProductCategoryKey,
     c.EnglishProductCategoryName
 FROM dimproduct as p
-JOIN dimproductsubcategory as s
-ON p.ProductSubcategoryKey = s.ProductSubcategoryKey
-JOIN dimproductcategory as c
-ON s.ProductCategoryKey = c.ProductCategoryKey;
+	JOIN dimproductsubcategory as s
+	ON p.ProductSubcategoryKey = s.ProductSubcategoryKey
+		JOIN dimproductcategory as c
+		ON s.ProductCategoryKey = c.ProductCategoryKey;
 
 -- 1.3 Esponi lʼelenco dei soli prodotti venduti (DimProduct, FactResellerSales). 
 SELECT * FROM factresellersales;
@@ -52,7 +53,9 @@ Group BY p.ProductKey, p.EnglishProductName;
 SELECT 
 	ProductKey, ProductAlternateKey, EnglishProductName
     FROM dimproduct
-    WHERE FinishedGoodsFlag <> 1;
+    WHERE ProductKey NOT IN (SELECT ProductKey FROM factresellersales)
+    AND
+    FinishedGoodsFlag = 1;
     
 -- 1.5 Esponi lʼelenco delle transazioni di vendita (FactResellerSales) indicando anche il nome del prodotto venduto (DimProduct)
 SELECT 
